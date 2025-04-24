@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unique Portfolio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fafafa;
+      color: #333;
+      overflow-x: hidden;
+      height: 100vh;
+    }
+
+    /* Utility Rail */
+    .utility-rail {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 60px;
+      height: 100vh;
+      background: #d3d3d3;
+      transition: width 0.3s ease;
+      z-index: 100;
+      overflow: hidden;
+    }
+
+    .utility-rail.expanded {
+      width: 180px;
+    }
+
+    .utility-rail-content {
+      padding: 20px 10px;
+      opacity: 0;
+      width: 160px;
+      transition: opacity 0.3s ease;
+    }
+
+    .utility-rail.expanded .utility-rail-content {
+      opacity: 1;
+    }
+
+    .rail-icon {
+      display: block;
+      margin: 0 auto 20px;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+    }
+
+    .rail-nav {
+      list-style: none;
+      margin-top: 40px;
+    }
+
+    .rail-nav li {
+      margin-bottom: 15px;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.3s ease;
+    }
+
+    .utility-rail.expanded .rail-nav li {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .rail-nav li a {
+      color: #333;
+      text-decoration: none;
+      display: block;
+      padding: 8px 10px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .rail-nav li a:hover {
+      background: rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+
+    /* Landing Page - Hero */
+    .landing-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      perspective: 1500px;
+    }
+
+    .hero-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 800px;
+      height: 80vh;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transform-origin: top right;
+      transition: transform 0.8s cubic-bezier(0.6, 0.2, 0.1, 1);
+    }
+
+    .hero-card.peeled {
+      transform: translate(-50%, -50%) rotateZ(-5deg) rotateY(-25deg);
+    }
+
+    .hero-content {
+      padding: 40px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .hero-content h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .hero-content p {
+      font-size: 18px;
+      max-width: 500px;
+      margin: 0 auto 30px;
+      line-height: 1.6;
+    }
+
+    .peel-corner {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 40px 40px 0;
+      border-color: transparent #c5e4ff transparent transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .peel-corner:hover {
+      border-width: 0 60px 60px 0;
+    }
+
+    .corner-hint {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 12px;
+      color: #555;
+      pointer-events: none;
+    }
+
+    /* Map Navigation Canvas */
+    .map-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      padding: 60px 80px 40px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease, visibility 0s 0.5s;
+    }
+
+    .map-canvas.active {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.5s ease;
+    }
+
+    .section-box {
+      background: #eaeaea;
+      border: 2px dashed #999;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .section-box:hover {
+      background: #f6f6f6;
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .section-box h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .section-box p {
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .mini-map {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 120px;
+      height: 60px;
+      background: #c5e4ff;
+      border-radius: 6px;
+      padding: 5px;
+      z-index: 10;
+    }
+
+    .mini-map-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #333;
+      border-radius: 50%;
+    }
+
+    /* Film Strip View */
+    .film-strip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      padding-left: 80px;
+      overflow-x: auto;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease, visibility 0s 0.5s;
+    }
+
+    .film-strip.active {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.5s ease;
+    }
+
+    .project-card {
+      flex: 0 0 auto;
+      width: min(80vw, 500px);
+      height: min(80vh, 600px);
+      margin: 80px 20px;
+      background: #eaeaea;
+      border: 2px dashed #999;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .project-card:hover {
+      background: #f6f6f6;
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .project-card h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .project-card p {
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .scroll-hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: #666;
+      background: rgba(255,255,255,0.8);
+      padding: 5px 15px;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Utility Rail -->
+  <div class="utility-rail">
+    <div class="utility-rail-content">
+      <svg class="rail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M12 8v8M8 12h8"></path>
+      </svg>
+      <ul class="rail-nav">
+        <li><a href="#" data-view="landing">Home</a></li>
+        <li><a href="#" data-view="map">Navigation</a></li>
+        <li><a href="#" data-view="projects">Projects</a></li>
+        <li><a href="#" data-view="about">About Me</a></li>
+        <li><a href="#" data-view="blog">Blog</a></li>
+        <li><a href="#" data-view="labs">Labs</a></li>
+        <li><a href="#" data-view="contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Landing Page - Hero Card -->
+  <div class="landing-container view" id="landing-view">
+    <div class="hero-card">
+      <div class="hero-content">
+        <h1>Vathsaran Yasotharan</h1>
+        <p>Welcome to my unique portfolio experience. Peel the corner or scroll to explore my journey.</p>
+        <p>I'm a data analyst passionate about turning numbers into insights, currently advancing my skills in machine learning and AI development.</p>
+      </div>
+      <div class="peel-corner"></div>
+      <div class="corner-hint">Peel here</div>
+    </div>
+  </div>
+
+  <!-- Map Navigation Canvas -->
+  <div class="map-canvas view" id="map-view">
+    <a href="#" class="section-box" data-view="about">
+      <h3>About</h3>
+      <p>Learn about my background, skills, and approaches to design.</p>
+    </a>
+    <a href="#" class="section-box" data-view="projects">
+      <h3>Work</h3>
+      <p>Browse through my featured projects and case studies.</p>
+    </a>
+    <a href="#" class="section-box" data-view="labs">
+      <h3>Labs</h3>
+      <p>Experimental projects and AI explorations.</p>
+    </a>
+    <a href="#" class="section-box" data-view="blog">
+      <h3>Blog</h3>
+      <p>Thoughts on data science, ML, and my learning journey.</p>
+    </a>
+    <a href="#" class="section-box" data-view="contact">
+      <h3>Contact</h3>
+      <p>Get in touch for collaborations and opportunities.</p>
+    </a>
+    <a href="#" class="section-box">
+      <h3>Extra</h3>
+      <p>Additional resources, tools, and inspirations.</p>
+    </a>
+    <div class="mini-map">
+      <div class="mini-map-dot" style="top: 25px; left: 30px;"></div>
+      <div class="mini-map-dot" style="top: 25px; left: 60px;"></div>
+      <div class="mini-map-dot" style="top: 25px; left: 90px;"></div>
+      <div class="mini-map-dot" style="top: 40px; left: 30px;"></div>
+      <div class="mini-map-dot" style="top: 40px; left: 60px;"></div>
+      <div class="mini-map-dot" style="top: 40px; left: 90px;"></div>
+    </div>
+  </div>
+
+  <!-- Film Strip View -->
+  <div class="film-strip view" id="projects-view">
+    <div class="project-card">
+      <h3>Customer Churn Prediction</h3>
+      <p>Developed a machine learning model to predict customer churn for a telecommunications company with 85% accuracy, helping identify at-risk customers for retention campaigns.</p>
+      <div style="margin-top: 20px; background: #f0f5ff; padding: 15px; border-radius: 8px;">
+        <p style="font-weight: 500; margin-bottom: 8px;">Technologies used:</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Python</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Scikit-Learn</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Pandas</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Tableau</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <h3>Retail Sales Dashboard</h3>
+      <p>Created an interactive dashboard analyzing 3 years of retail sales data, revealing seasonal trends and product performance metrics that led to a 12% inventory optimization.</p>
+      <div style="margin-top: 20px; background: #f0f5ff; padding: 15px; border-radius: 8px;">
+        <p style="font-weight: 500; margin-bottom: 8px;">Technologies used:</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">SQL</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Power BI</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Excel</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">DAX</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <h3>Sentiment Analysis Tool</h3>
+      <p>Built a natural language processing application that analyzes customer reviews to extract sentiment and key themes, processing over 10,000 comments to identify product improvement opportunities.</p>
+      <div style="margin-top: 20px; background: #f0f5ff; padding: 15px; border-radius: 8px;">
+        <p style="font-weight: 500; margin-bottom: 8px;">Technologies used:</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Python</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">NLTK</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">spaCy</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Flask</span>
+        </div>
+      </div>
+    </div>
+    <div class="project-card">
+      <h3>Housing Price Predictor</h3>
+      <p>Engineered a regression model to predict housing prices based on multiple variables including location, size, and amenities, achieving an R² score of 0.89 across test data.</p>
+      <div style="margin-top: 20px; background: #f0f5ff; padding: 15px; border-radius: 8px;">
+        <p style="font-weight: 500; margin-bottom: 8px;">Technologies used:</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Python</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">TensorFlow</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Pandas</span>
+          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Matplotlib</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint">← Scroll horizontally →</div>
+      <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
+  </div>
+
+  <!-- About View -->
+  <div class="view" id="about-view" style="display: none; padding: 80px 80px 80px 140px; max-width: 1200px; margin: 0 auto;">
+    <h2 style="font-size: 32px; margin-bottom: 30px;">About Me</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
+      <div>
+        <h3 style="margin-bottom: 15px; font-size: 22px;">Hello, I'm Vathsaran</h3>
+        <p style="line-height: 1.6; margin-bottom: 20px;">As a data analyst student, I'm on a journey to transform complex data into meaningful stories and actionable insights. My background combines analytical thinking with a curiosity for discovering patterns that others might miss.</p>
+        
+        <p style="line-height: 1.6; margin-bottom: 20px;">Currently, I'm focused on polishing my data analysis toolkit while exploring the fascinating world of machine learning. What excites me most is how data can reveal hidden truths and help make better decisions.</p>
+        
+        <p style="line-height: 1.6;">Looking ahead, I'm particularly interested in AI development and how it can be leveraged to solve real-world problems. I believe that the intersection of human insight and machine intelligence is where the most innovative solutions emerge.</p>
+      </div>
+      
+      <div>
+        <h3 style="margin-bottom: 15px; font-size: 22px;">Skills & Expertise</h3>
+        
+        <div style="margin-bottom: 25px;">
+          <h4 style="margin-bottom: 10px; font-size: 18px;">Data Analysis</h4>
+          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+            <div style="background: #66b3ff; height: 10px; width: 85%;"></div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <h4 style="margin-bottom: 10px; font-size: 18px;">Python</h4>
+          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+            <div style="background: #66b3ff; height: 10px; width: 80%;"></div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <h4 style="margin-bottom: 10px; font-size: 18px;">SQL</h4>
+          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+            <div style="background: #66b3ff; height: 10px; width: 75%;"></div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <h4 style="margin-bottom: 10px; font-size: 18px;">Machine Learning</h4>
+          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+            <div style="background: #66b3ff; height: 10px; width: 65%;"></div>
+          </div>
+        </div>
+        
+        <div>
+          <h4 style="margin-bottom: 10px; font-size: 18px;">Data Visualization</h4>
+          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
+            <div style="background: #66b3ff; height: 10px; width: 78%;"></div>
+          </div>
+        </div>
+      </div>
+        <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
+    </div>
+    
+    <div>
+      <h3 style="margin-bottom: 20px; font-size: 22px;">Education & Learning Path</h3>
+      <div style="display: flex; margin-bottom: 30px;">
+        <div style="width: 50px; height: 50px; background: #c5e4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;">
+          <span>📚</span>
+        </div>
+        <div>
+          <h4 style="margin-bottom: 5px; font-size: 18px;">Data Analysis Program</h4>
+          <p style="color: #666; margin-bottom: 10px;">Focused coursework in statistical analysis, data processing, and visualization</p>
+        </div>
+      </div>
+      
+      <div style="display: flex; margin-bottom: 30px;">
+        <div style="width: 50px; height: 50px; background: #c5e4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;">
+          <span>🧠</span>
+        </div>
+        <div>
+          <h4 style="margin-bottom: 5px; font-size: 18px;">Machine Learning Deep Dive</h4>
+          <p style="color: #666; margin-bottom: 10px;">Self-directed learning in various ML algorithms and applications</p>
+        </div>
+      </div>
+      
+      <div style="display: flex;">
+        <div style="width: 50px; height: 50px; background: #c5e4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;">
+          <span>🔍</span>
+        </div>
+        <div>
+          <h4 style="margin-bottom: 5px; font-size: 18px;">Continuous Learning</h4>
+          <p style="color: #666;">Regularly participating in data challenges and online courses to stay current with emerging technologies</p>
+        </div>
+      </div>
+    </div>
+      <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
+  </div>
+
+  <!-- Contact View -->
+  <div class="view" id="contact-view" style="display: none; padding: 80px 80px 80px 140px; max-width: 900px; margin: 0 auto;">
+    <h2 style="font-size: 32px; margin-bottom: 40px;">Get In Touch</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;">
+      <div>
+        <p style="line-height: 1.7; margin-bottom: 30px;">I'm always open to discussing data projects, collaboration opportunities, or just chatting about the latest in data science and AI. Feel free to reach out!</p>
+        
+        <div style="margin-bottom: 25px;">
+          <h3 style="font-size: 18px; margin-bottom: 10px;">Email</h3>
+          <a href="mailto:varosaran@gmail.com" style="color: #0066cc; text-decoration: none; display: flex; align-items: center;">
+            <svg style="width: 20px; height: 20px; margin-right: 10px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            varosaran@gmail.com
+          </a>
+        </div>
+        
+        <div>
+          <h3 style="font-size: 18px; margin-bottom: 15px;">Connect on Social</h3>
+          <div style="display: flex; gap: 15px;">
+            <a href="https://www.linkedin.com" target="_blank" style="color: #0077b5; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f0f5ff;">
+              <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                <rect x="2" y="9" width="4" height="12"></rect>
+                <circle cx="4" cy="4" r="2"></circle>
+              </svg>
+            </a>
+            <a href="https://www.github.com" target="_blank" style="color: #333; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f0f5ff;">
+              <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+            </a>
+            <a href="https://www.twitter.com" target="_blank" style="color: #1DA1F2; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f0f5ff;">
+              <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+              </svg>
+            </a>
+            <a href="https://www.kaggle.com" target="_blank" style="color: #20BEFF; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f0f5ff;">
+              <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.8,8.8L15.9,7l-4.8,4.8L8.8,9.5l-1.9,1.9l3.8,3.8l7.1-7.1L17.8,8.8L17.8,8.8z M12,2c5.5,0,10,4.5,10,10 s-4.5,10-10,10S2,17.5,2,12S6.5,2,12,2 M12,0C5.4,0,0,5.4,0,12s5.4,12,12,12s12-5.4,12-12S18.6,0,12,0L12,0z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+          <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
+      </div>
+      
+      <div style="background: #f8f8f8; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+        <h3 style="font-size: 20px; margin-bottom: 20px;">Send a Message</h3>
+        <form>
+          <div style="margin-bottom: 15px;">
+            <label for="name" style="display: block; margin-bottom: 5px; font-size: 14px;">Name</label>
+            <input type="text" id="name" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label for="email" style="display: block; margin-bottom: 5px; font-size: 14px;">Email</label>
+            <input type="email" id="email" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label for="message" style="display: block; margin-bottom: 5px; font-size: 14px;">Message</label>
+            <textarea id="message" rows="5" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+          </div>
+          <button type="submit" style="background: #66b3ff; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: 500;">Send Message</button>
+        </form>
+      </div>
+    </div>
+      <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
+  </div>
+
+  <!-- Add Blog View Section -->
+<div class="view" id="blog-view" style="display: none; padding: 80px 80px 80px 140px; max-width: 900px; margin: 0 auto;">
+  <h2 style="font-size: 32px; margin-bottom: 40px;">My Blog</h2>
+  <div style="display: grid; gap: 40px;">
+    <div style="background: #f8f8f8; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+      <h3 style="margin-bottom: 10px;">Exploring Machine Learning in Healthcare</h3>
+      <p style="color: #666; line-height: 1.6;">A breakdown of how machine learning is transforming diagnostics, patient care, and predictive analysis within the healthcare industry.</p>
+      <p style="margin-top: 10px; font-size: 14px; color: #999;">Posted: April 2025</p>
+    </div>
+    <div style="background: #f8f8f8; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+      <h3 style="margin-bottom: 10px;">Top 5 Python Libraries for Data Science</h3>
+      <p style="color: #666; line-height: 1.6;">An overview of essential Python libraries that every data scientist should know, including usage tips and real-world applications.</p>
+      <p style="margin-top: 10px; font-size: 14px; color: #999;">Posted: March 2025</p>
+    </div>
+  </div>
+    <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
+</div>
+
+<!-- Add Labs View Section -->
+<div class="view" id="labs-view" style="display: none; padding: 80px 80px 80px 140px; max-width: 1000px; margin: 0 auto;">
+  <h2 style="font-size: 32px; margin-bottom: 40px;">Labs & Experiments</h2>
+  <div style="display: grid; gap: 30px;">
+    <div style="background: #eef5ff; padding: 25px; border-radius: 10px;">
+      <h3>AI Chatbot Prototype</h3>
+      <p style="color: #555; line-height: 1.6;">A simple JavaScript-based chatbot that answers user queries using keyword-based logic. Future versions will include LLM integration.</p>
+    </div>
+    <div style="background: #eef5ff; padding: 25px; border-radius: 10px;">
+      <h3>CSS Animation Playground</h3>
+      <p style="color: #555; line-height: 1.6;">An interactive space to test and showcase different CSS animation effects including keyframe transitions and transform experiments.</p>
+    </div>
+  </div>
+    <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
+</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const utilityRail = document.querySelector('.utility-rail');
+      const railIcon = document.querySelector('.rail-icon');
+      const heroCard = document.querySelector('.hero-card');
+      const peelCorner = document.querySelector('.peel-corner');
+      const views = document.querySelectorAll('.view');
+      const navLinks = document.querySelectorAll('.rail-nav a, .section-box');
+
+      // Utility rail toggle
+      railIcon.addEventListener('click', () => {
+        utilityRail.classList.toggle('expanded');
+      });
+
+      // Peel corner action
+      peelCorner.addEventListener('click', () => {
+        heroCard.classList.add('peeled');
+        setTimeout(() => switchView('map'), 800);
+      });
+
+      // Enable mouse horizontal scroll with shift key (optional enhancement)
+      document.querySelectorAll('.view div[style*="overflow-x: auto"]').forEach(container => {
+        container.addEventListener('wheel', function(e) {
+          if (e.deltaY !== 0) {
+            e.preventDefault();
+            container.scrollLeft += e.deltaY;
+          }
+        });
+      });
+
+      // View switcher
+      function switchView(viewId) {
+        views.forEach(view => {
+          view.style.display = 'none';
+          view.classList.remove('active');
+        });
+        const targetView = document.getElementById(`${viewId}-view`);
+        if (targetView) {
+          targetView.style.display = '';
+          setTimeout(() => targetView.classList.add('active'), 50);
+        }
+      }
+
+      // Navigation links
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const viewName = link.getAttribute('data-view');
+          if (viewName) {
+            switchView(viewName);
+            if (window.innerWidth < 768) {
+              utilityRail.classList.remove('expanded');
+            }
+          }
+        });
+      });
+
+      // Scroll triggers peel
+      window.addEventListener('wheel', (e) => {
+        if (document.getElementById('landing-view').style.display !== 'none' && e.deltaY > 0) {
+          heroCard.classList.add('peeled');
+          setTimeout(() => switchView('map'), 800);
+        }
+      });
+
+      // Demo form handling
+      document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          alert('Message submitted! (This is a demo - no actual submission occurs)');
+          form.reset();
+        });
+      });
+
+      // Delay nav animation
+      document.querySelectorAll('.rail-nav li').forEach((item, i) => {
+        item.style.transitionDelay = `${0.1 + i * 0.05}s`;
+      });
+
+      // Minimap interaction
+      document.querySelectorAll('.section-box').forEach((section, i) => {
+        section.addEventListener('mouseover', () => {
+          const dots = document.querySelectorAll('.mini-map-dot');
+          dots.forEach(dot => {
+            dot.style.background = '#333';
+            dot.style.transform = 'scale(1)';
+          });
+          if (dots[i]) {
+            dots[i].style.background = '#4d7cff';
+            dots[i].style.transform = 'scale(1.5)';
+          }
+        });
+        section.addEventListener('mouseout', () => {
+          document.querySelectorAll('.mini-map-dot').forEach(dot => {
+            dot.style.background = '#333';
+            dot.style.transform = 'scale(1)';
+          });
+        });
+      });
+
+      
+
+      // Responsive collapse
+      function handleResize() {
+        if (window.innerWidth < 768) {
+          utilityRail.classList.remove('expanded');
+        }
+      }
+
+      window.addEventListener('resize', handleResize);
+      handleResize();
+      switchView('landing');
+    });
+  </script>
+</body>
+</html>
