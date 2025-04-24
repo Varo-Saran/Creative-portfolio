@@ -1,10 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unique Portfolio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vathsaran Yasotharan | Portfolio</title>
+  <!--
+   ———————————————————————————————————————————
+    GLOBAL STYLES & DESIGN TOKENS
+   ———————————————————————————————————————————
+  -->
   <style>
+    /* Root tokens*/
+    :root {
+      /*‑‑Palette*/
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --primary-light: #c5e4ff;
+      --text: #333;
+      --text-light: #666;
+      --bg-main: #fafafa;
+      --bg-sidebar: #ffffff;
+      --bg-card: #ffffff;
+      /*‑‑Elevation*/
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+      /*‑‑Shape*/
+      --border-radius: 12px;
+      /*‑‑Motion*/
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      /*‑‑Layout*/
+      --sidebar-width: 240px;
+      --sidebar-collapsed: 64px;
+    }
+
+    /* Dark‑mode override*/
+    body.dark-mode {
+      --primary-light: #2b3c94;
+      --text: #e1e1e1;
+      --text-light: #a0a0a0;
+      --bg-main: #121212;
+      --bg-sidebar: #1e1e1e;
+      --bg-card: #1e1e1e;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Reset styles */
     * {
       margin: 0;
       padding: 0;
@@ -13,283 +53,403 @@
     
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #fafafa;
-      color: #333;
+      background: var(--bg-main);
+      color: var(--text);
       overflow-x: hidden;
-      height: 100vh;
+      min-height: 100vh;
     }
 
-    /* Utility Rail */
+    /***********************
+     * LAYOUT – UTILITY RAIL
+     ***********************/
     .utility-rail {
       position: fixed;
-      left: 0;
-      top: 0;
-      width: 60px;
-      height: 100vh;
-      background: #d3d3d3;
-      transition: width 0.3s ease;
+      inset: 0 auto 0 0;
+      width: var(--sidebar-collapsed);
+      background: var(--bg-sidebar);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
       z-index: 100;
       overflow: hidden;
     }
+    .utility-rail.expanded { width: var(--sidebar-width); }
 
-    .utility-rail.expanded {
-      width: 180px;
-    }
-
-    .utility-rail-content {
-      padding: 20px 10px;
-      opacity: 0;
-      width: 160px;
-      transition: opacity 0.3s ease;
-    }
-
-    .utility-rail.expanded .utility-rail-content {
-      opacity: 1;
-    }
-
-    .rail-icon {
-      display: block;
-      margin: 0 auto 20px;
+    /* Toggle button */
+    .utility-rail-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px; height: 32px;
+      display: grid; place-items: center;
+      border-radius: 50%;
       cursor: pointer;
-      width: 30px;
-      height: 30px;
-    }
-
-    .rail-nav {
-      list-style: none;
-      margin-top: 40px;
-    }
-
-    .rail-nav li {
-      margin-bottom: 15px;
-      opacity: 0;
-      transform: translateX(-20px);
-      transition: all 0.3s ease;
-    }
-
-    .utility-rail.expanded .rail-nav li {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .rail-nav li a {
-      color: #333;
-      text-decoration: none;
-      display: block;
-      padding: 8px 10px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .rail-nav li a:hover {
-      background: rgba(0,0,0,0.1);
-      border-radius: 4px;
-    }
-
-    /* Landing Page - Hero */
-    .landing-container {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-      perspective: 1500px;
-    }
-
-    .hero-card {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 80%;
-      max-width: 800px;
-      height: 80vh;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      overflow: hidden;
-      transform-origin: top right;
-      transition: transform 0.8s cubic-bezier(0.6, 0.2, 0.1, 1);
-    }
-
-    .hero-card.peeled {
-      transform: translate(-50%, -50%) rotateZ(-5deg) rotateY(-25deg);
-    }
-
-    .hero-content {
-      padding: 40px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-    }
-
-    .hero-content h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-      font-weight: 700;
-    }
-
-    .hero-content p {
-      font-size: 18px;
-      max-width: 500px;
-      margin: 0 auto 30px;
-      line-height: 1.6;
-    }
-
-    .peel-corner {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 0 40px 40px 0;
-      border-color: transparent #c5e4ff transparent transparent;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .peel-corner:hover {
-      border-width: 0 60px 60px 0;
-    }
-
-    .corner-hint {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 12px;
-      color: #555;
-      pointer-events: none;
-    }
-
-    /* Map Navigation Canvas */
-    .map-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      padding: 60px 80px 40px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap: 20px;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.5s ease, visibility 0s 0.5s;
-    }
-
-    .map-canvas.active {
-      opacity: 1;
-      visibility: visible;
-      transition: opacity 0.5s ease;
-    }
-
-    .section-box {
-      background: #eaeaea;
-      border: 2px dashed #999;
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      color: #333;
-    }
-
-    .section-box:hover {
-      background: #f6f6f6;
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .section-box h3 {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-
-    .section-box p {
-      font-size: 14px;
-      text-align: center;
-    }
-
-    .mini-map {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 120px;
-      height: 60px;
-      background: #c5e4ff;
-      border-radius: 6px;
-      padding: 5px;
+      background: rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
       z-index: 10;
     }
+    .utility-rail-toggle:hover { background: rgba(0, 0, 0, 0.1); }
 
-    .mini-map-dot {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: #333;
-      border-radius: 50%;
-    }
+    .rail-toggle-icon { width: 20px; height: 20px; color: var(--text); }
 
-    /* Film Strip View */
-    .film-strip {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
+    /* Rail inner content */
+    .utility-rail-content {
+      padding: 20px 12px;
+      width: var(--sidebar-width);
       display: flex;
-      padding-left: 80px;
-      overflow-x: auto;
+      flex-direction: column;
+      height: 100%;
+      opacity: 0.4;
+      transition: var(--transition);
+    }
+    .utility-rail.expanded .utility-rail-content { opacity: 1; }
+
+    /* Profile header */
+    .rail-header {
+      position: relative;
+      height: 36px;
+      margin: 16px 0 32px;
+      padding: 0 12px;
+      display: flex; align-items: center;
+    }
+    .profile-avatar {
+      position: absolute; inset: 0 auto 0 12px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+    }
+    .rail-title {
+      position: absolute; left: 60px;
+      font-size: 16px; font-weight: 600;
+      color: var(--text);
       opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.5s ease, visibility 0s 0.5s;
+      transform: translateX(-10px);
+      white-space: nowrap;
+      transition: var(--transition);
+    }
+    .utility-rail.expanded .rail-title {
+      opacity: 1; transform: translateX(0);
     }
 
-    .film-strip.active {
-      opacity: 1;
-      visibility: visible;
+    /* Navigation */
+    .rail-nav { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .rail-nav-item {
+      position: relative;
+      display: flex; align-items: center;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-light);
+      text-decoration: none;
+      transition: var(--transition);
+      overflow: hidden;
+    }
+    .rail-nav-item:hover { background: rgba(0, 0, 0, 0.05); color: var(--text); }
+    .rail-nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 500;
+    }
+    .rail-nav-item.active::before {
+      content: "";
+      position: absolute; left: 0; top: 50%;
+      width: 4px; height: 20px;
+      background: var(--primary);
+      transform: translateY(-50%);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .rail-nav-icon { width: 20px; height: 20px; margin-right: 16px; flex-shrink: 0; }
+    .rail-nav-item span {
+      position: absolute; left: 48px;
+      opacity: 0; transform: translateX(-10px);
+      white-space: nowrap;
+      transition: var(--transition);
+    }
+    .utility-rail.expanded .rail-nav-item span {
+      opacity: 1; transform: translateX(0);
+    }
+
+    /* Rail footer */
+    .rail-footer {
+      margin-top: auto;
+      padding: 16px 12px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .utility-rail.expanded .rail-footer { justify-content: space-between; }
+
+    .social-links { display: flex; gap: 8px; opacity: 0; width: 0; transition: var(--transition); }
+    .utility-rail.expanded .social-links { opacity: 1; width: auto; }
+
+    .social-icon {
+      width: 30px; height: 30px;
+      display: grid; place-items: center;
+      color: var(--text-light);
+      border-radius: 8px; transition: var(--transition);
+    }
+    .social-icon:hover { background: rgba(0, 0, 0, 0.05); color: var(--primary); }
+
+    .theme-toggle {
+      width: 30px; height: 30px; border-radius: 8px;
+      display: grid; place-items: center;
+      color: var(--text-light); cursor: pointer;
+      transition: var(--transition);
+    }
+    .theme-toggle:hover { background: rgba(0, 0, 0, 0.05); color: var(--primary); }
+    .theme-icon { width: 18px; height: 18px; }
+
+    /***********************
+     * MAIN CONTENT WRAPPER
+     ***********************/
+    .main-wrapper { display: flex; min-height: 100vh; }
+
+    .content-container {
+      flex: 1;
+      margin-left: var(--sidebar-collapsed);
+      width: calc(100% - var(--sidebar-collapsed));
+      transition: var(--transition);
+    }
+    body:has(.utility-rail.expanded) .content-container {
+      margin-left: var(--sidebar-width);
+      width: calc(100% - var(--sidebar-width));
+    }
+
+    /***********************
+     * LANDING – HERO CARD
+     ***********************/
+    .landing-container {
+      position: relative;
+      width: 100%; height: 100vh;
+      overflow: hidden;
+      perspective: 1500px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-card {
+      position: relative;
+      width: 80%; max-width: 800px;
+      height: 80vh;
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      transform-origin: top right;
+      transition: transform 0.8s cubic-bezier(0.6, 0.2, 0.1, 1);
+      overflow: hidden;
+    }
+    .hero-card.peeled { transform: rotateZ(-5deg) rotateY(-25deg); }
+
+    .hero-content {
+      height: 100%; padding: 40px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .hero-content h1 { font-size: 48px; margin-bottom: 20px; font-weight: 700; }
+    .hero-content p { font-size: 18px; line-height: 1.6; max-width: 500px; margin: 0 auto 20px; }
+
+    .peel-corner {
+      position: absolute; top: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 40px 40px 0;
+      border-color: transparent var(--primary-light) transparent transparent;
+      cursor: pointer;
+      transition: border-width 0.3s ease;
+    }
+    .peel-corner:hover { border-width: 0 60px 60px 0; }
+
+    .corner-hint { position: absolute; top: 10px; right: 10px; font-size: 12px; color: var(--text-light); pointer-events: none; }
+
+    /***********************
+     * EXPERIENCE MAP
+     ***********************/
+    .map-canvas {
+      position: relative;
+      min-height: 100vh;
+      padding: 60px 40px;
+      background: var(--bg-main);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .view {
+      display: none;
+      opacity: 0;
       transition: opacity 0.5s ease;
+    }
+    
+    .view.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .map-header { text-align: center; margin-bottom: 40px; }
+    .map-title {
+      position: relative;
+      font-size: 36px; font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+      display: inline-block;
+    }
+    .map-title::after {
+      content: ""; position: absolute; left: 50%; bottom: -10px;
+      width: 60px; height: 4px;
+      background: var(--primary);
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+    .map-subtitle { color: var(--text-light); font-size: 18px; }
+
+    .map-grid {
+      display: grid; gap: 30px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      margin-bottom: 60px;
+    }
+
+    .section-card {
+      position: relative;
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 30px;
+      display: flex; align-items: center;
+      min-height: 180px;
+      text-decoration: none; color: var(--text);
+      transition: var(--transition);
+      overflow: hidden;
+      opacity: 0; transform: translateY(30px);
+    }
+    .section-card.revealed { opacity: 1; transform: translateY(0); }
+    .section-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+    .section-card::before {
+      content: ""; position: absolute; inset: 0 auto 0 0;
+      width: 6px; background: var(--primary); opacity: 0; transition: var(--transition);
+    }
+    .section-card:hover::before { opacity: 1; }
+
+    .card-icon {
+      width: 50px; height: 50px;
+      display: grid; place-items: center;
+      margin-right: 20px; flex-shrink: 0;
+      background: var(--primary-light);
+      border-radius: 12px;
+      color: var(--primary-dark);
+      transition: var(--transition);
+    }
+    .section-card:hover .card-icon { transform: scale(1.1); color: var(--primary); }
+    .card-icon svg { width: 24px; height: 24px; }
+
+    .card-content { flex: 1; }
+    .card-content h3 { font-size: 22px; font-weight: 600; margin-bottom: 8px; transition: var(--transition); }
+    .section-card:hover .card-content h3 { color: var(--primary); }
+    .card-content p { color: var(--text-light); margin-bottom: 15px; font-size: 15px; }
+
+    .card-details { display: flex; flex-wrap: wrap; gap: 8px; }
+    .card-tag {
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      font-size: 12px; font-weight: 500;
+      padding: 4px 8px; border-radius: 4px;
+    }
+
+    .card-indicator { width: 24px; height: 24px; color: var(--primary); opacity: 0; transform: translateX(-10px); transition: var(--transition); flex-shrink: 0; }
+    .section-card:hover .card-indicator { opacity: 1; transform: translateX(0); }
+
+    /* Journey footer */
+    .map-footer { margin-top: auto; padding-top: 30px; }
+    .journey-indicator { max-width: 600px; margin: 0 auto; }
+    .journey-line {
+      height: 4px; background: rgba(0, 0, 0, 0.1);
+      border-radius: 2px; position: relative; margin-bottom: 10px;
+    }
+    .journey-dot {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 12px; height: 12px; border-radius: 50%; cursor: pointer;
+      background: var(--bg-card); border: 2px solid rgba(0, 0, 0, 0.25);
+      transition: var(--transition);
+    }
+    .journey-dot.active {
+      background: var(--primary); border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+    .journey-dot:hover { transform: translateY(-50%) scale(1.2); }
+
+    .journey-labels { display: flex; justify-content: space-between; margin-top: 5px; }
+    .journey-label { font-size: 12px; color: var(--text-light); cursor: pointer; transition: var(--transition); }
+    .journey-label:hover { color: var(--primary); }
+
+    /***********************
+     * FILM STRIP – PROJECTS
+     ***********************/
+    .film-strip {
+      display: flex;
+      padding: 60px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      height: 100vh;
     }
 
     .project-card {
       flex: 0 0 auto;
       width: min(80vw, 500px);
       height: min(80vh, 600px);
-      margin: 80px 20px;
-      background: #eaeaea;
-      border: 2px dashed #999;
-      border-radius: 8px;
-      padding: 20px;
+      margin: 20px;
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 30px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
+      transition: var(--transition);
     }
-
+    
     .project-card:hover {
-      background: #f6f6f6;
       transform: translateY(-10px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow-hover);
     }
-
+    
     .project-card h3 {
       font-size: 24px;
       margin-bottom: 15px;
     }
-
+    
     .project-card p {
-      text-align: center;
-      max-width: 400px;
+      line-height: 1.6;
+      color: var(--text-light);
+    }
+    
+    .tech-container {
+      margin-top: 20px;
+      background: rgba(67, 97, 238, 0.08);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: auto;
+    }
+    
+    .tech-title {
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .tech-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .tech-tag {
+      background: rgba(67, 97, 238, 0.15);
+      color: var(--primary);
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
     }
 
     .scroll-hint {
@@ -297,448 +457,781 @@
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 14px;
-      color: #666;
-      background: rgba(255,255,255,0.8);
-      padding: 5px 15px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px 16px;
       border-radius: 20px;
+      font-size: 14px;
+      color: var(--text-light);
+      box-shadow: var(--shadow);
+    }
+
+    /***********************
+     * OTHER VIEWS (ABOUT, CONTACT, BLOG, LABS)
+     ***********************/
+    .content-view {
+      padding: 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: var(--text);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+    
+    .back-button:hover {
+      background: var(--primary);
+    }
+    
+    .back-button svg {
+      margin-right: 8px;
+    }
+    
+    /* Skills bars */
+    .skill-container {
+      margin-bottom: 25px;
+    }
+    
+    .skill-bar-bg {
+      background: rgba(0, 0, 0, 0.1);
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .skill-bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 5px;
+      transition: width 1s ease-out;
+    }
+    
+    /* Blog cards */
+    .blog-card {
+      background: var(--bg-card);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+    
+    .blog-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+    
+    /* Contact form */
+    .contact-form-container {
+      background: var(--bg-card);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      font-family: inherit;
+      background: var(--bg-main);
+      color: var(--text);
+      transition: var(--transition);
+    }
+    
+    .form-input:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+    
+    .submit-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .submit-button:hover {
+      background: var(--primary-dark);
+    }
+
+    /***********************
+     * RESPONSIVE TWEAKS
+     ***********************/
+    @media (max-width: 768px) {
+      .utility-rail { width: 0; }
+      .utility-rail.expanded { width: var(--sidebar-width); }
+      .utility-rail-toggle { left: 12px; top: 12px; background: var(--bg-sidebar); box-shadow: var(--shadow); }
+
+      .content-container,
+      body:has(.utility-rail.expanded) .content-container { margin-left: 0; width: 100%; }
+      
+      .map-grid { grid-template-columns: 1fr; }
+      .journey-labels { display: none; }
+      
+      .section-card { 
+        padding: 20px; 
+        min-height: auto; 
+      }
+      
+      .card-icon { 
+        width: 40px; 
+        height: 40px; 
+      }
+      
+      .card-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+      
+      .content-view {
+        padding: 60px 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Utility Rail -->
-  <div class="utility-rail">
-    <div class="utility-rail-content">
-      <svg class="rail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"></circle>
-        <path d="M12 8v8M8 12h8"></path>
-      </svg>
-      <ul class="rail-nav">
-        <li><a href="#" data-view="landing">Home</a></li>
-        <li><a href="#" data-view="map">Navigation</a></li>
-        <li><a href="#" data-view="projects">Projects</a></li>
-        <li><a href="#" data-view="about">About Me</a></li>
-        <li><a href="#" data-view="blog">Blog</a></li>
-        <li><a href="#" data-view="labs">Labs</a></li>
-        <li><a href="#" data-view="contact">Contact</a></li>
-      </ul>
-    </div>
-  </div>
+  <div class="main-wrapper">
+    <!--‑‑UTILITY RAIL‑‑-->
+    <aside class="utility-rail" aria-label="Site navigation">
+      <button class="utility-rail-toggle" aria-label="Toggle sidebar">
+        <svg class="rail-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+      </button>
 
-  <!-- Landing Page - Hero Card -->
-  <div class="landing-container view" id="landing-view">
-    <div class="hero-card">
-      <div class="hero-content">
-        <h1>Vathsaran Yasotharan</h1>
-        <p>Welcome to my unique portfolio experience. Peel the corner or scroll to explore my journey.</p>
-        <p>I'm a data analyst passionate about turning numbers into insights, currently advancing my skills in machine learning and AI development.</p>
-      </div>
-      <div class="peel-corner"></div>
-      <div class="corner-hint">Peel here</div>
-    </div>
-  </div>
+      <div class="utility-rail-content">
+        <!-- Profile -->
+        <header class="rail-header">
+          <span class="profile-avatar">VA</span>
+          <h3 class="rail-title">Vathsaran</h3>
+        </header>
 
-  <!-- Map Navigation Canvas -->
-  <div class="map-canvas view" id="map-view">
-    <a href="#" class="section-box" data-view="about">
-      <h3>About</h3>
-      <p>Learn about my background, skills, and approaches to design.</p>
-    </a>
-    <a href="#" class="section-box" data-view="projects">
-      <h3>Work</h3>
-      <p>Browse through my featured projects and case studies.</p>
-    </a>
-    <a href="#" class="section-box" data-view="labs">
-      <h3>Labs</h3>
-      <p>Experimental projects and AI explorations.</p>
-    </a>
-    <a href="#" class="section-box" data-view="blog">
-      <h3>Blog</h3>
-      <p>Thoughts on data science, ML, and my learning journey.</p>
-    </a>
-    <a href="#" class="section-box" data-view="contact">
-      <h3>Contact</h3>
-      <p>Get in touch for collaborations and opportunities.</p>
-    </a>
-    <a href="#" class="section-box">
-      <h3>Extra</h3>
-      <p>Additional resources, tools, and inspirations.</p>
-    </a>
-    <div class="mini-map">
-      <div class="mini-map-dot" style="top: 25px; left: 30px;"></div>
-      <div class="mini-map-dot" style="top: 25px; left: 60px;"></div>
-      <div class="mini-map-dot" style="top: 25px; left: 90px;"></div>
-      <div class="mini-map-dot" style="top: 40px; left: 30px;"></div>
-      <div class="mini-map-dot" style="top: 40px; left: 60px;"></div>
-      <div class="mini-map-dot" style="top: 40px; left: 90px;"></div>
-    </div>
-  </div>
+        <!-- Navigation -->
+        <nav class="rail-nav">
+          <a class="rail-nav-item active" data-view="landing" href="#">
+            <svg class="rail-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+            <span>Home</span></a>
+          <a class="rail-nav-item" data-view="map" href="#">
+            <svg class="rail-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="9" y1="21" x2="9" y2="9" /></svg>
+            <span>Navigation</span></a>
+          <a class="rail-nav-item" data-view="projects" href="#">
+            <svg class="rail-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></svg>
+            <span>Projects</span></a>
+          <a class="rail-nav-item" data-view="about" href="#">
+            <svg class="rail-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4" /><path d="M12 11c-2.21 0-4 1.79-4 4v7h8v-7c0-2.21-1.79-4-4-4z" /></svg>
+            <span>About Me</span></a>
+          <a class="rail-nav-item" data-view="blog" href="#">
+            <svg class="rail-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z" /><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" /><path d="M2 2l7.586 7.586" /><circle cx="11" cy="11" r="2" /></svg>
+            <span>Blog</span></a>
+          <a class="rail-nav-item" data-view="labs" href="#">
+            <svg class="rail-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31" /><path d="M14 9.3V2" /><path d="M8.5 2h7" /><path d="M14 9.3a6 6 0 1 1-4 0" /><path d="M5.52 16h12.96" /></svg>
+            <span>Labs</span></a>
+          <a class="rail-nav-item" data-view="contact" href="#">
+            <svg class="rail-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+            <span>Contact</span></a>
+        </nav>
 
-  <!-- Film Strip View -->
-  <div class="film-strip view" id="projects-view">
-    <div class="project-card">
-      <h3>Customer Churn Prediction</h3>
-      <p>Developed a machine learning model to predict customer churn for a telecommunications company with 85% accuracy, helping identify at-risk customers for retention campaigns.</p>
-      <div style="margin-top: 20px; background: #f0f5ff; padding: 15px; border-radius: 8px;">
-        <p style="font-weight: 500; margin-bottom: 8px;">Technologies used:</p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Python</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Scikit-Learn</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Pandas</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Tableau</span>
-        </div>
+        <!-- Footer -->
+        <footer class="rail-footer">
+          <div class="social-links">
+            <a href="https://linkedin.com" class="social-icon" aria-label="LinkedIn" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg></a>
+            <a href="https://github.com" class="social-icon" aria-label="GitHub" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" /></svg></a>
+            <a href="https://twitter.com" class="social-icon" aria-label="Twitter" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" /></svg></a>
+          </div>
+          <button class="theme-toggle" aria-label="Toggle dark mode">
+            <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
+          </button>
+        </footer>
       </div>
-    </div>
-    <div class="project-card">
-      <h3>Retail Sales Dashboard</h3>
-      <p>Created an interactive dashboard analyzing 3 years of retail sales data, revealing seasonal trends and product performance metrics that led to a 12% inventory optimization.</p>
-      <div style="margin-top: 20px; background: #f0f5ff; padding: 15px; border-radius: 8px;">
-        <p style="font-weight: 500; margin-bottom: 8px;">Technologies used:</p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">SQL</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Power BI</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Excel</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">DAX</span>
-        </div>
-      </div>
-    </div>
-    <div class="project-card">
-      <h3>Sentiment Analysis Tool</h3>
-      <p>Built a natural language processing application that analyzes customer reviews to extract sentiment and key themes, processing over 10,000 comments to identify product improvement opportunities.</p>
-      <div style="margin-top: 20px; background: #f0f5ff; padding: 15px; border-radius: 8px;">
-        <p style="font-weight: 500; margin-bottom: 8px;">Technologies used:</p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Python</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">NLTK</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">spaCy</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Flask</span>
-        </div>
-      </div>
-    </div>
-    <div class="project-card">
-      <h3>Housing Price Predictor</h3>
-      <p>Engineered a regression model to predict housing prices based on multiple variables including location, size, and amenities, achieving an R² score of 0.89 across test data.</p>
-      <div style="margin-top: 20px; background: #f0f5ff; padding: 15px; border-radius: 8px;">
-        <p style="font-weight: 500; margin-bottom: 8px;">Technologies used:</p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Python</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">TensorFlow</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Pandas</span>
-          <span style="background: #e0e9ff; padding: 5px 10px; border-radius: 4px; font-size: 12px;">Matplotlib</span>
-        </div>
-      </div>
-    </div>
-    <div class="scroll-hint">← Scroll horizontally →</div>
-      <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
-  </div>
+    </aside>
 
-  <!-- About View -->
-  <div class="view" id="about-view" style="display: none; padding: 80px 80px 80px 140px; max-width: 1200px; margin: 0 auto;">
-    <h2 style="font-size: 32px; margin-bottom: 30px;">About Me</h2>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
-      <div>
-        <h3 style="margin-bottom: 15px; font-size: 22px;">Hello, I'm Vathsaran</h3>
-        <p style="line-height: 1.6; margin-bottom: 20px;">As a data analyst student, I'm on a journey to transform complex data into meaningful stories and actionable insights. My background combines analytical thinking with a curiosity for discovering patterns that others might miss.</p>
-        
-        <p style="line-height: 1.6; margin-bottom: 20px;">Currently, I'm focused on polishing my data analysis toolkit while exploring the fascinating world of machine learning. What excites me most is how data can reveal hidden truths and help make better decisions.</p>
-        
-        <p style="line-height: 1.6;">Looking ahead, I'm particularly interested in AI development and how it can be leveraged to solve real-world problems. I believe that the intersection of human insight and machine intelligence is where the most innovative solutions emerge.</p>
-      </div>
-      
-      <div>
-        <h3 style="margin-bottom: 15px; font-size: 22px;">Skills & Expertise</h3>
-        
-        <div style="margin-bottom: 25px;">
-          <h4 style="margin-bottom: 10px; font-size: 18px;">Data Analysis</h4>
-          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
-            <div style="background: #66b3ff; height: 10px; width: 85%;"></div>
+    <!--‑‑CONTENT CONTAINER‑‑-->
+    <main class="content-container">
+      <!--‑‑Landing ‑‑-->
+      <section class="landing-container view active" id="landing-view">
+        <div class="hero-card">
+          <div class="hero-content">
+            <h1>Vathsaran Yasotharan</h1>
+            <p>Welcome to my unique portfolio experience. Peel the corner or scroll to explore my journey.</p>
+            <p>I'm a data analyst turning numbers into insights, currently diving deeper into ML & AI.</p>
           </div>
+          <div class="peel-corner"></div>
+          <span class="corner-hint">Peel here</span>
         </div>
-        
-        <div style="margin-bottom: 25px;">
-          <h4 style="margin-bottom: 10px; font-size: 18px;">Python</h4>
-          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
-            <div style="background: #66b3ff; height: 10px; width: 80%;"></div>
-          </div>
-        </div>
-        
-        <div style="margin-bottom: 25px;">
-          <h4 style="margin-bottom: 10px; font-size: 18px;">SQL</h4>
-          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
-            <div style="background: #66b3ff; height: 10px; width: 75%;"></div>
-          </div>
-        </div>
-        
-        <div style="margin-bottom: 25px;">
-          <h4 style="margin-bottom: 10px; font-size: 18px;">Machine Learning</h4>
-          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
-            <div style="background: #66b3ff; height: 10px; width: 65%;"></div>
-          </div>
-        </div>
-        
-        <div>
-          <h4 style="margin-bottom: 10px; font-size: 18px;">Data Visualization</h4>
-          <div style="background: #eee; height: 10px; border-radius: 5px; overflow: hidden;">
-            <div style="background: #66b3ff; height: 10px; width: 78%;"></div>
-          </div>
-        </div>
-      </div>
-        <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
-    </div>
-    
-    <div>
-      <h3 style="margin-bottom: 20px; font-size: 22px;">Education & Learning Path</h3>
-      <div style="display: flex; margin-bottom: 30px;">
-        <div style="width: 50px; height: 50px; background: #c5e4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;">
-          <span>📚</span>
-        </div>
-        <div>
-          <h4 style="margin-bottom: 5px; font-size: 18px;">Data Analysis Program</h4>
-          <p style="color: #666; margin-bottom: 10px;">Focused coursework in statistical analysis, data processing, and visualization</p>
-        </div>
-      </div>
-      
-      <div style="display: flex; margin-bottom: 30px;">
-        <div style="width: 50px; height: 50px; background: #c5e4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;">
-          <span>🧠</span>
-        </div>
-        <div>
-          <h4 style="margin-bottom: 5px; font-size: 18px;">Machine Learning Deep Dive</h4>
-          <p style="color: #666; margin-bottom: 10px;">Self-directed learning in various ML algorithms and applications</p>
-        </div>
-      </div>
-      
-      <div style="display: flex;">
-        <div style="width: 50px; height: 50px; background: #c5e4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;">
-          <span>🔍</span>
-        </div>
-        <div>
-          <h4 style="margin-bottom: 5px; font-size: 18px;">Continuous Learning</h4>
-          <p style="color: #666;">Regularly participating in data challenges and online courses to stay current with emerging technologies</p>
-        </div>
-      </div>
-    </div>
-      <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
-  </div>
+      </section>
 
-  <!-- Contact View -->
-  <div class="view" id="contact-view" style="display: none; padding: 80px 80px 80px 140px; max-width: 900px; margin: 0 auto;">
-    <h2 style="font-size: 32px; margin-bottom: 40px;">Get In Touch</h2>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;">
-      <div>
-        <p style="line-height: 1.7; margin-bottom: 30px;">I'm always open to discussing data projects, collaboration opportunities, or just chatting about the latest in data science and AI. Feel free to reach out!</p>
-        
-        <div style="margin-bottom: 25px;">
-          <h3 style="font-size: 18px; margin-bottom: 10px;">Email</h3>
-          <a href="mailto:varosaran@gmail.com" style="color: #0066cc; text-decoration: none; display: flex; align-items: center;">
-            <svg style="width: 20px; height: 20px; margin-right: 10px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-              <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            varosaran@gmail.com
+      <!--‑‑Experience Map‑‑-->
+      <section class="map-canvas view" id="map-view">
+        <header class="map-header">
+          <h2 class="map-title">Experience Map</h2>
+          <p class="map-subtitle">Navigate through my portfolio sections</p>
+        </header>
+
+        <div class="map-grid">
+          <a href="#" class="section-card" data-view="about">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="7" r="4"></circle>
+                <path d="M12 11c-2.21 0-4 1.79-4 4v7h8v-7c0-2.21-1.79-4-4-4z"></path>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h3>About Me</h3>
+              <p>My background, skills & journey</p>
+              <div class="card-details">
+                <span class="card-tag">Profile</span>
+                <span class="card-tag">Skills</span>
+                <span class="card-tag">Education</span>
+              </div>
+            </div>
+            <div class="card-indicator">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </a>
+          
+          <a href="#" class="section-card" data-view="projects">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h3>Projects</h3>
+              <p>Portfolio of my featured work</p>
+              <div class="card-details">
+                <span class="card-tag">ML</span>
+                <span class="card-tag">Data</span>
+                <span class="card-tag">Analysis</span>
+              </div>
+            </div>
+            <div class="card-indicator">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </a>
+          
+          <a href="#" class="section-card" data-view="labs">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 2v7.31"></path>
+                <path d="M14 9.3V2"></path>
+                <path d="M8.5 2h7"></path>
+                <path d="M14 9.3a6 6 0 1 1-4 0"></path>
+                <path d="M5.52 16h12.96"></path>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h3>Labs</h3>
+              <p>Experimental projects & explorations</p>
+              <div class="card-details">
+                <span class="card-tag">Experiments</span>
+                <span class="card-tag">AI</span>
+                <span class="card-tag">Innovation</span>
+              </div>
+            </div>
+            <div class="card-indicator">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </a>
+          
+          <a href="#" class="section-card" data-view="blog">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                <path d="M2 2l7.586 7.586"></path>
+                <circle cx="11" cy="11" r="2"></circle>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h3>Blog</h3>
+              <p>Articles on data science & ML</p>
+              <div class="card-details">
+                <span class="card-tag">Insights</span>
+                <span class="card-tag">Tutorials</span>
+                <span class="card-tag">Learning</span>
+              </div>
+            </div>
+            <div class="card-indicator">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </a>
+          
+          <a href="#" class="section-card" data-view="contact">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h3>Contact</h3>
+              <p>Connect with me for opportunities</p>
+              <div class="card-details">
+                <span class="card-tag">Email</span>
+                <span class="card-tag">Social</span>
+                <span class="card-tag">Chat</span>
+              </div>
+            </div>
+            <div class="card-indicator">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </a>
+          
+          <a href="#" class="section-card" data-view="resources">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </div>
+            <div class="card-content">
+              <h3>Resources</h3>
+              <p>Helpful tools & inspirations</p>
+              <div class="card-details">
+                <span class="card-tag">Tools</span>
+                <span class="card-tag">Links</span>
+                <span class="card-tag">Code</span>
+              </div>
+            </div>
+            <div class="card-indicator">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
           </a>
         </div>
         
-        <div>
-          <h3 style="font-size: 18px; margin-bottom: 15px;">Connect on Social</h3>
-          <div style="display: flex; gap: 15px;">
-            <a href="https://www.linkedin.com" target="_blank" style="color: #0077b5; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f0f5ff;">
-              <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                <rect x="2" y="9" width="4" height="12"></rect>
-                <circle cx="4" cy="4" r="2"></circle>
-              </svg>
-            </a>
-            <a href="https://www.github.com" target="_blank" style="color: #333; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f0f5ff;">
-              <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-              </svg>
-            </a>
-            <a href="https://www.twitter.com" target="_blank" style="color: #1DA1F2; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f0f5ff;">
-              <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
-              </svg>
-            </a>
-            <a href="https://www.kaggle.com" target="_blank" style="color: #20BEFF; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f0f5ff;">
-              <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.8,8.8L15.9,7l-4.8,4.8L8.8,9.5l-1.9,1.9l3.8,3.8l7.1-7.1L17.8,8.8L17.8,8.8z M12,2c5.5,0,10,4.5,10,10 s-4.5,10-10,10S2,17.5,2,12S6.5,2,12,2 M12,0C5.4,0,0,5.4,0,12s5.4,12,12,12s12-5.4,12-12S18.6,0,12,0L12,0z"/>
-              </svg>
-            </a>
+        <!-- Journey Footer -->
+        <footer class="map-footer">
+          <div class="journey-indicator">
+            <div class="journey-line">
+              <div class="journey-dot active" data-section="about" style="left:0%"></div>
+              <div class="journey-dot" data-section="projects" style="left:20%"></div>
+              <div class="journey-dot" data-section="labs" style="left:40%"></div>
+              <div class="journey-dot" data-section="blog" style="left:60%"></div>
+              <div class="journey-dot" data-section="contact" style="left:80%"></div>
+              <div class="journey-dot" data-section="resources" style="left:100%"></div>
+            </div>
+            <div class="journey-labels">
+              <span class="journey-label">Start</span>
+              <span class="journey-label">Build</span>
+              <span class="journey-label">Tinker</span>
+              <span class="journey-label">Share</span>
+              <span class="journey-label">Connect</span>
+              <span class="journey-label">More</span>
+            </div>
+          </div>
+        </footer>
+      </section>
+
+      <!-- Projects View -->
+      <section class="film-strip view" id="projects-view">
+        <div class="project-card">
+          <h3>Customer Churn Prediction</h3>
+          <p>Developed a machine learning model to predict customer churn for a telecommunications company with 85% accuracy, helping identify at-risk customers for retention campaigns.</p>
+          <div class="tech-container">
+            <p class="tech-title">Technologies used:</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Python</span>
+              <span class="tech-tag">Scikit-Learn</span>
+              <span class="tech-tag">Pandas</span>
+              <span class="tech-tag">Tableau</span>
+            </div>
           </div>
         </div>
-          <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
-      </div>
-      
-      <div style="background: #f8f8f8; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-        <h3 style="font-size: 20px; margin-bottom: 20px;">Send a Message</h3>
-        <form>
-          <div style="margin-bottom: 15px;">
-            <label for="name" style="display: block; margin-bottom: 5px; font-size: 14px;">Name</label>
-            <input type="text" id="name" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        
+        <div class="project-card">
+          <h3>Retail Sales Dashboard</h3>
+          <p>Created an interactive dashboard analyzing 3 years of retail sales data, revealing seasonal trends and product performance metrics that led to a 12% inventory optimization.</p>
+          <div class="tech-container">
+            <p class="tech-title">Technologies used:</p>
+            <div class="tech-tags">
+              <span class="tech-tag">SQL</span>
+              <span class="tech-tag">Power BI</span>
+              <span class="tech-tag">Excel</span>
+              <span class="tech-tag">DAX</span>
+            </div>
           </div>
-          <div style="margin-bottom: 15px;">
-            <label for="email" style="display: block; margin-bottom: 5px; font-size: 14px;">Email</label>
-            <input type="email" id="email" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div class="project-card">
+          <h3>Sentiment Analysis Tool</h3>
+          <p>Built a natural language processing application that analyzes customer reviews to extract sentiment and key themes, processing over 10,000 comments to identify product improvement opportunities.</p>
+          <div class="tech-container">
+            <p class="tech-title">Technologies used:</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Python</span>
+              <span class="tech-tag">NLTK</span>
+              <span class="tech-tag">spaCy</span>
+              <span class="tech-tag">Flask</span>
+            </div>
           </div>
-          <div style="margin-bottom: 15px;">
-            <label for="message" style="display: block; margin-bottom: 5px; font-size: 14px;">Message</label>
-            <textarea id="message" rows="5" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+        </div>
+        
+        <div class="project-card">
+          <h3>Housing Price Predictor</h3>
+          <p>Engineered a regression model to predict housing prices based on multiple variables including location, size, and amenities, achieving an R² score of 0.89 across test data.</p>
+          <div class="tech-container">
+            <p class="tech-title">Technologies used:</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Python</span>
+              <span class="tech-tag">TensorFlow</span>
+              <span class="tech-tag">Pandas</span>
+              <span class="tech-tag">Matplotlib</span>
+            </div>
           </div>
-          <button type="submit" style="background: #66b3ff; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: 500;">Send Message</button>
-        </form>
-      </div>
-    </div>
-      <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
-  </div>
+        </div>
+        
+        <div class="scroll-hint">← Scroll horizontally →</div>
+        <button class="back-button" onclick="switchView('map')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Map
+        </button>
+      </section>
 
-  <!-- Add Blog View Section -->
-<div class="view" id="blog-view" style="display: none; padding: 80px 80px 80px 140px; max-width: 900px; margin: 0 auto;">
-  <h2 style="font-size: 32px; margin-bottom: 40px;">My Blog</h2>
-  <div style="display: grid; gap: 40px;">
-    <div style="background: #f8f8f8; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-      <h3 style="margin-bottom: 10px;">Exploring Machine Learning in Healthcare</h3>
-      <p style="color: #666; line-height: 1.6;">A breakdown of how machine learning is transforming diagnostics, patient care, and predictive analysis within the healthcare industry.</p>
-      <p style="margin-top: 10px; font-size: 14px; color: #999;">Posted: April 2025</p>
-    </div>
-    <div style="background: #f8f8f8; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-      <h3 style="margin-bottom: 10px;">Top 5 Python Libraries for Data Science</h3>
-      <p style="color: #666; line-height: 1.6;">An overview of essential Python libraries that every data scientist should know, including usage tips and real-world applications.</p>
-      <p style="margin-top: 10px; font-size: 14px; color: #999;">Posted: March 2025</p>
-    </div>
-  </div>
-    <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
-</div>
+      <!-- About View -->
+      <section class="content-view view" id="about-view">
+        <h2 style="font-size: 32px; margin-bottom: 30px;">About Me</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
+          <div>
+            <h3 style="margin-bottom: 15px; font-size: 22px;">Hello, I'm Vathsaran</h3>
+            <p style="line-height: 1.6; margin-bottom: 20px;">As a data analyst student, I'm on a journey to transform complex data into meaningful stories and actionable insights. My background combines analytical thinking with a curiosity for discovering patterns that others might miss.</p>
+            
+            <p style="line-height: 1.6; margin-bottom: 20px;">Currently, I'm focused on polishing my data analysis toolkit while exploring the fascinating world of machine learning. What excites me most is how data can reveal hidden truths and help make better decisions.</p>
+            
+            <p style="line-height: 1.6;">Looking ahead, I'm particularly interested in AI development and how it can be leveraged to solve real-world problems. I believe that the intersection of human insight and machine intelligence is where the most innovative solutions emerge.</p>
+          </div>
+          
+          <div>
+            <h3 style="margin-bottom: 15px; font-size: 22px;">Skills & Expertise</h3>
+            
+            <div class="skill-container">
+              <h4 style="margin-bottom: 10px; font-size: 18px;">Data Analysis</h4>
+              <div class="skill-bar-bg">
+                <div class="skill-bar-fill" style="width: 85%;"></div>
+              </div>
+            </div>
+            
+            <div class="skill-container">
+              <h4 style="margin-bottom: 10px; font-size: 18px;">Python</h4>
+              <div class="skill-bar-bg">
+                <div class="skill-bar-fill" style="width: 80%;"></div>
+              </div>
+            </div>
+            
+            <div class="skill-container">
+              <h4 style="margin-bottom: 10px; font-size: 18px;">SQL</h4>
+              <div class="skill-bar-bg">
+                <div class="skill-bar-fill" style="width: 75%;"></div>
+              </div>
+            </div>
+            
+            <div class="skill-container">
+              <h4 style="margin-bottom: 10px; font-size: 18px;">Machine Learning</h4>
+              <div class="skill-bar-bg">
+                <div class="skill-bar-fill" style="width: 65%;"></div>
+              </div>
+            </div>
+            
+            <div class="skill-container">
+              <h4 style="margin-bottom: 10px; font-size: 18px;">Data Visualization</h4>
+              <div class="skill-bar-bg">
+                <div class="skill-bar-fill" style="width: 78%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h3 style="margin-bottom: 20px; font-size: 22px;">Education & Learning Path</h3>
+          <div style="display: flex; margin-bottom: 30px;">
+            <div style="width: 50px; height: 50px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;">
+              <span>📚</span>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 5px; font-size: 18px;">Data Analysis Program</h4>
+              <p style="color: var(--text-light); margin-bottom: 10px;">Focused coursework in statistical analysis, data processing, and visualization</p>
+            </div>
+          </div>
+          
+          <div style="display: flex; margin-bottom: 30px;">
+            <div style="width: 50px; height: 50px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;">
+              <span>🧠</span>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 5px; font-size: 18px;">Machine Learning Deep Dive</h4>
+              <p style="color: var(--text-light); margin-bottom: 10px;">Self-directed learning in various ML algorithms and applications</p>
+            </div>
+          </div>
+          
+          <div style="display: flex;">
+            <div style="width: 50px; height: 50px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; flex-shrink: 0;">
+              <span>🔍</span>
+            </div>
+            <div>
+              <h4 style="margin-bottom: 5px; font-size: 18px;">Continuous Learning</h4>
+              <p style="color: var(--text-light);">Regularly participating in data challenges and online courses to stay current with emerging technologies</p>
+            </div>
+          </div>
+        </div>
+        
+        <button class="back-button" onclick="switchView('map')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Map
+        </button>
+      </section>
 
-<!-- Add Labs View Section -->
-<div class="view" id="labs-view" style="display: none; padding: 80px 80px 80px 140px; max-width: 1000px; margin: 0 auto;">
-  <h2 style="font-size: 32px; margin-bottom: 40px;">Labs & Experiments</h2>
-  <div style="display: grid; gap: 30px;">
-    <div style="background: #eef5ff; padding: 25px; border-radius: 10px;">
-      <h3>AI Chatbot Prototype</h3>
-      <p style="color: #555; line-height: 1.6;">A simple JavaScript-based chatbot that answers user queries using keyword-based logic. Future versions will include LLM integration.</p>
-    </div>
-    <div style="background: #eef5ff; padding: 25px; border-radius: 10px;">
-      <h3>CSS Animation Playground</h3>
-      <p style="color: #555; line-height: 1.6;">An interactive space to test and showcase different CSS animation effects including keyframe transitions and transform experiments.</p>
-    </div>
+      <!-- Contact View -->
+      <section class="content-view view" id="contact-view">
+        <h2 style="font-size: 32px; margin-bottom: 40px;">Get In Touch</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;">
+          <div>
+            <p style="line-height: 1.7; margin-bottom: 30px;">I'm always open to discussing data projects, collaboration opportunities, or just chatting about the latest in data science and AI. Feel free to reach out!</p>
+            
+            <div style="margin-bottom: 25px;">
+              <h3 style="font-size: 18px; margin-bottom: 10px;">Email</h3>
+              <a href="mailto:varosaran@gmail.com" style="color: var(--primary); text-decoration: none; display: flex; align-items: center;">
+                <svg style="width: 20px; height: 20px; margin-right: 10px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                varosaran@gmail.com
+              </a>
+            </div>
+            
+            <div>
+              <h3 style="font-size: 18px; margin-bottom: 15px;">Connect on Social</h3>
+              <div style="display: flex; gap: 15px;">
+                <a href="https://www.linkedin.com" target="_blank" style="color: #0077b5; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(67, 97, 238, 0.1);">
+                  <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                    <rect x="2" y="9" width="4" height="12"></rect>
+                    <circle cx="4" cy="4" r="2"></circle>
+                  </svg>
+                </a>
+                <a href="https://www.github.com" target="_blank" style="color: var(--text); display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(67, 97, 238, 0.1);">
+                  <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                  </svg>
+                </a>
+                <a href="https://www.twitter.com" target="_blank" style="color: #1DA1F2; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(67, 97, 238, 0.1);">
+                  <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                  </svg>
+                </a>
+                <a href="https://www.kaggle.com" target="_blank" style="color: #20BEFF; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(67, 97, 238, 0.1);">
+                  <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.8,8.8L15.9,7l-4.8,4.8L8.8,9.5l-1.9,1.9l3.8,3.8l7.1-7.1L17.8,8.8L17.8,8.8z M12,2c5.5,0,10,4.5,10,10 s-4.5,10-10,10S2,17.5,2,12S6.5,2,12,2 M12,0C5.4,0,0,5.4,0,12s5.4,12,12,12s12-5.4,12-12S18.6,0,12,0L12,0z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="contact-form-container">
+            <h3 style="font-size: 20px; margin-bottom: 20px;">Send a Message</h3>
+            <form>
+              <div class="form-group">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" id="name" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="message" class="form-label">Message</label>
+                <textarea id="message" rows="5" class="form-textarea"></textarea>
+              </div>
+              <button type="submit" class="submit-button">Send Message</button>
+            </form>
+          </div>
+        </div>
+        
+        <button class="back-button" onclick="switchView('map')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Map
+        </button>
+      </section>
+
+      <!-- Blog View -->
+      <section class="content-view view" id="blog-view">
+        <h2 style="font-size: 32px; margin-bottom: 40px;">My Blog</h2>
+        <div style="display: grid; gap: 40px;">
+          <div class="blog-card">
+            <h3 style="margin-bottom: 10px;">Exploring Machine Learning in Healthcare</h3>
+            <p style="color: var(--text-light); line-height: 1.6;">A breakdown of how machine learning is transforming diagnostics, patient care, and predictive analysis within the healthcare industry.</p>
+            <p style="margin-top: 10px; font-size: 14px; color: #999;">Posted: April 2025</p>
+          </div>
+          <div class="blog-card">
+            <h3 style="margin-bottom: 10px;">Top 5 Python Libraries for Data Science</h3>
+            <p style="color: var(--text-light); line-height: 1.6;">An overview of essential Python libraries that every data scientist should know, including usage tips and real-world applications.</p>
+            <p style="margin-top: 10px; font-size: 14px; color: #999;">Posted: March 2025</p>
+          </div>
+        </div>
+        
+        <button class="back-button" onclick="switchView('map')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Map
+        </button>
+      </section>
+
+      <!-- Labs View -->
+      <section class="content-view view" id="labs-view">
+        <h2 style="font-size: 32px; margin-bottom: 40px;">Labs & Experiments</h2>
+        <div style="display: grid; gap: 30px;">
+          <div class="blog-card">
+            <h3>AI Chatbot Prototype</h3>
+            <p style="color: var(--text-light); line-height: 1.6;">A simple JavaScript-based chatbot that answers user queries using keyword-based logic. Future versions will include LLM integration.</p>
+          </div>
+          <div class="blog-card">
+            <h3>CSS Animation Playground</h3>
+            <p style="color: var(--text-light); line-height: 1.6;">An interactive space to test and showcase different CSS animation effects including keyframe transitions and transform experiments.</p>
+          </div>
+        </div>
+        
+        <button class="back-button" onclick="switchView('map')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Map
+        </button>
+      </section>
+    </main>
   </div>
-    <button onclick="switchView('section-map')" style="margin-top: 30px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 6px; cursor: pointer;">← Back to Sections</button>
-</div>
+  <!--———————————————————————————————————————————-->
+  <!-- Scripts -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const utilityRail = document.querySelector('.utility-rail');
-      const railIcon = document.querySelector('.rail-icon');
-      const heroCard = document.querySelector('.hero-card');
-      const peelCorner = document.querySelector('.peel-corner');
-      const views = document.querySelectorAll('.view');
-      const navLinks = document.querySelectorAll('.rail-nav a, .section-box');
+    /* Helper selectors */
+    const $ = (sel, ctx = document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
 
-      // Utility rail toggle
-      railIcon.addEventListener('click', () => {
-        utilityRail.classList.toggle('expanded');
-      });
+    const rail = $('.utility-rail');
+    const railToggle = $('.utility-rail-toggle');
+    const themeToggle = $('.theme-toggle');
+    const views = $$('.view');
 
-      // Peel corner action
-      peelCorner.addEventListener('click', () => {
-        heroCard.classList.add('peeled');
-        setTimeout(() => switchView('map'), 800);
-      });
+    /** Persisted UI states */
+    const storedDark = localStorage.getItem('darkMode') === 'true';
+    const storedRail = localStorage.getItem('sidebarExpanded') === 'true';
+    if (storedDark) document.body.classList.add('dark-mode');
+    if (storedRail && window.innerWidth >= 768) rail.classList.add('expanded');
 
-      // Enable mouse horizontal scroll with shift key (optional enhancement)
-      document.querySelectorAll('.view div[style*="overflow-x: auto"]').forEach(container => {
-        container.addEventListener('wheel', function(e) {
-          if (e.deltaY !== 0) {
-            e.preventDefault();
-            container.scrollLeft += e.deltaY;
-          }
-        });
-      });
-
-      // View switcher
-      function switchView(viewId) {
-        views.forEach(view => {
-          view.style.display = 'none';
-          view.classList.remove('active');
-        });
-        const targetView = document.getElementById(`${viewId}-view`);
-        if (targetView) {
-          targetView.style.display = '';
-          setTimeout(() => targetView.classList.add('active'), 50);
-        }
-      }
-
-      // Navigation links
-      navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const viewName = link.getAttribute('data-view');
-          if (viewName) {
-            switchView(viewName);
-            if (window.innerWidth < 768) {
-              utilityRail.classList.remove('expanded');
-            }
-          }
-        });
-      });
-
-      // Scroll triggers peel
-      window.addEventListener('wheel', (e) => {
-        if (document.getElementById('landing-view').style.display !== 'none' && e.deltaY > 0) {
-          heroCard.classList.add('peeled');
-          setTimeout(() => switchView('map'), 800);
-        }
-      });
-
-      // Demo form handling
-      document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
-          alert('Message submitted! (This is a demo - no actual submission occurs)');
-          form.reset();
-        });
-      });
-
-      // Delay nav animation
-      document.querySelectorAll('.rail-nav li').forEach((item, i) => {
-        item.style.transitionDelay = `${0.1 + i * 0.05}s`;
-      });
-
-      // Minimap interaction
-      document.querySelectorAll('.section-box').forEach((section, i) => {
-        section.addEventListener('mouseover', () => {
-          const dots = document.querySelectorAll('.mini-map-dot');
-          dots.forEach(dot => {
-            dot.style.background = '#333';
-            dot.style.transform = 'scale(1)';
-          });
-          if (dots[i]) {
-            dots[i].style.background = '#4d7cff';
-            dots[i].style.transform = 'scale(1.5)';
-          }
-        });
-        section.addEventListener('mouseout', () => {
-          document.querySelectorAll('.mini-map-dot').forEach(dot => {
-            dot.style.background = '#333';
-            dot.style.transform = 'scale(1)';
-          });
-        });
-      });
-
-      
-
-      // Responsive collapse
-      function handleResize() {
-        if (window.innerWidth < 768) {
-          utilityRail.classList.remove('expanded');
-        }
-      }
-
-      window.addEventListener('resize', handleResize);
-      handleResize();
-      switchView('landing');
+    /** Sidebar toggle */
+    railToggle.addEventListener('click', () => {
+      rail.classList.toggle('expanded');
+      localStorage.setItem('sidebarExpanded', rail.classList.contains('expanded'));
     });
+
+    /** Theme toggle */
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    });
+
+    /** Switch view and highlight nav/journey */
+    function setActiveInList(list, attr, value) {
+      list.forEach(el => el.classList.toggle('active', el.getAttribute(attr) === value));
+    }
+    function switchView(id) {
+      views.forEach(v => {
+        v.classList.toggle('active', v.id === id + '-view');
+      });
+      setActiveInList($$('.rail-nav-item'), 'data-view', id);
+      setActiveInList($$('.journey-dot'), 'data-section', id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /** Nav click */
+    $$('.rail-nav-item').forEach(item => item.addEventListener('click', e => { 
+      e.preventDefault(); 
+      switchView(item.dataset.view); 
+      if (window.innerWidth < 768) rail.classList.remove('expanded'); 
+    }));
+
+    /** Journey dot click */
+    $$('.journey-dot').forEach(dot => dot.addEventListener('click', () => switchView(dot.dataset.section)));
+
+    /** Hero peel interaction */
+    const heroCard = $('.hero-card');
+    $('.peel-corner').addEventListener('click', () => { 
+      heroCard.classList.add('peeled'); 
+      setTimeout(() => switchView('map'), 800); 
+    });
+    window.addEventListener('wheel', e => { 
+      if ($('#landing-view').classList.contains('active') && e.deltaY > 0) { 
+        heroCard.classList.add('peeled'); 
+        setTimeout(() => switchView('map'), 800); 
+      } 
+    });
+
+    /** Reveal section cards on scroll */
+    const reveal = () => {
+      $$('.section-card').forEach(card => { 
+        if (!card.classList.contains('revealed') && card.getBoundingClientRect().top < innerHeight * 0.8) {
+          card.classList.add('revealed'); 
+        }
+      });
+    };
+    document.addEventListener('scroll', reveal);
+    window.addEventListener('load', () => { 
+      switchView('landing'); 
+      reveal(); 
+    });
+
+    /** Form submission demo */
+    $$('form').forEach(f => f.addEventListener('submit', e => { 
+      e.preventDefault(); 
+      alert('Message submitted! (demo)'); 
+      f.reset(); 
+    }));
   </script>
 </body>
 </html>
